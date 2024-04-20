@@ -5,14 +5,14 @@ TODO:
 - [x] check code I write against reference implementation
   - [x] print properly and check outputs
 - [ ] layers' forwards and backwards passes
+  - [x] `GELU`
+  - [ ] `softmax`
+  - [ ] `crossentropy`
   - [ ] `encoder`
   - [ ] `layernorm`
   - [ ] `matmul` (linear/fully-connected/dense)
   - [ ] `attention`
-  - [x] `GELU`
   - [ ] `residual`
-  - [ ] `softmax`
-  - [ ] `crossentropy`
 - [ ] model building blocks
   - [ ] `ParameterTensors`
   - [ ] `ActivationTensors`
