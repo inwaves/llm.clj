@@ -8,7 +8,7 @@
 
 (defn t_allclose 
   ([input other rtol atol]
-  ;; |input - other | <= atol + rtol * |other|
+  "|input - other | <= atol + rtol * |other|"
   (let [atol (double atol)
         rtol (double rtol)]
   (defn single_allclose [single_inp single_other]
@@ -20,8 +20,13 @@
 )
 
 (defn t_idx [tensor & indices]
-  ;; Python-style slicing. Takes in an atom, returns an atom.
-  ;; Probably wasn't necessary, could use modified get-in.
+  "Python-style slicing.
+   Params:
+    tensor (Atom) - the tensor to slice into;
+    indices (vector) - indices to select;
+   Returns:
+    sliced_tensor (Atom) - requested values from the original tensor."
+
   (letfn [(resolve-index [coll indices]
             (if (seq indices)
               (let [[index & rest-indices] indices]
@@ -34,6 +39,7 @@
     (atom (resolve-index @tensor indices))))
 
 (defn t_size [tensor]
+  "Get the size of a given tensor, return it as a tensor."
   (let [dims (atom [(count @tensor)])]
      (loop [t_copy @tensor]
        (when (vector? (first t_copy))
@@ -44,20 +50,20 @@
   dims)
 )
 
-
 (defn t_fill [fill_value sizes]
+  "Fill a tensor of a given shape with fill_value."
   (if (in? sizes 0)
     (throw (IllegalArgumentException. "Cannot have size 0.")))
   (atom
-  (if (= (count sizes) 1)
-    (vec (repeat (first sizes) fill_value)) ;; Base case: repeat value.
-    (vec (repeat 
-           (first sizes) 
-           @(t_fill fill_value (rest sizes))
-           ) ;; Repeat prev vector.
+    (if (= (count sizes) 1)
+      (vec (repeat (first sizes) fill_value)) ;; Base case: repeat value.
+      (vec (repeat 
+            (first sizes) 
+            @(t_fill fill_value (rest sizes))
+            ) ;; Repeat prev tensor.
+      )
     )
   )
-)
 )
 
 (defn t_zeros [sizes]
@@ -66,9 +72,12 @@
 (defn t_ones [sizes]
   (t_fill 1 sizes))
 
-(defn t_fill_like [t_other]
-  ;; TODO:
-  (t_size t_other)
-  )
+(defn t_fill_like [fill_value t_other]
+  (t_fill fill_value @(t_size t_other))
+)
 
-;; zeros_like, ones_like
+(defn t_zeros_like [t_other]
+  (t_fill_like 0 t_other))
+
+(defn t_ones_like [t_other]
+  (t_fill_like 1 t_other))
