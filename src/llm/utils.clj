@@ -4,20 +4,14 @@
 (defn in? [xs el] (some #(= % el) xs))
 
 (defn assert_all [_fn & test_cases]
+  ;; TODO:
 )
 
-(defn t_allclose 
-  ([input other rtol atol]
-  "|input - other | <= atol + rtol * |other|"
-  (let [atol (double atol)
-        rtol (double rtol)]
-  (defn single_allclose [single_inp single_other]
-    (<= (abs (- single_inp single_other)) (+ atol (* rtol (abs single_other))))
-  )
-  (every? true? (map single_allclose input other))
-  ))
-  ([input other] (t_allclose input other 0.1 0))
-)
+(defn flatten_tensor [tensor]
+  (if (vector? tensor)
+    (vec (mapcat flatten_tensor tensor))
+    [tensor]))
+
 
 (defn t_idx [tensor & indices]
   "Python-style slicing.
@@ -48,6 +42,29 @@
          )
     )
   dims)
+)
+
+(defn t_flatten [tensor]
+  (let [size (t_size tensor)
+        total_elements (reduce * @size)
+        flattened (flatten_tensor @tensor)]
+    (assert (= total_elements (count flattened)))
+    (atom flattened))
+)
+
+(defn t_allclose 
+  ([input other rtol atol]
+  "|input - other | <= atol + rtol * |other|"
+  (let [atol (double atol)
+        rtol (double rtol)
+        flat_input (t_flatten input)
+        flat_other (t_flatten other)]
+  (defn single_allclose [single_inp single_other]
+    (<= (abs (- single_inp single_other)) (+ atol (* rtol (abs single_other))))
+  )
+  (every? true? (map single_allclose @flat_input @flat_other))
+  ))
+  ([input other] (t_allclose input other 0.1 0))
 )
 
 (defn t_fill [fill_value sizes]

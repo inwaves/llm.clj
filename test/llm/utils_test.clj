@@ -7,16 +7,16 @@
 
 (deftest t_allclose_test
   (testing "Normal usage..."
-    (is true (t_allclose [1.1 2.1 3.1 4.1] [1.0 2.0 3.0 4.0] 0.1 1))
+    (is true (t_allclose (atom [1.1 2.1 3.1 4.1]) (atom [1.0 2.0 3.0 4.0]) 0.1 1))
     (println "[OK] t_allclose..."))
 )
 
 (deftest t_idx_test
   (testing "Normal usage..."
     (let [inp (atom [[[0 1] [1 2] [2 3]] [[3 4] [4 5] [5 6]]])]
-      (assert (= @(t_idx inp 0 0 1) @(atom [1])))
-      (assert (= @(t_idx inp 0) @(atom [[0 1] [1 2] [2 3]])))
-      (assert (= @(t_idx inp [0 1] 0) @(atom [[0 1] [3 4]])))))
+      (is (= @(t_idx inp 0 0 1) @(atom [1])))
+      (is (= @(t_idx inp 0) @(atom [[0 1] [1 2] [2 3]])))
+      (is (= @(t_idx inp [0 1] 0) @(atom [[0 1] [3 4]])))))
   (testing "Corner cases...") ;; TODO:
     (println "[OK] t_idx...")
 )
@@ -24,8 +24,8 @@
 (deftest t_size_test
   (testing "Normal usage..."
     (let [inp (atom [[1 2] [3 4]])]
-      (assert (= @(t_size inp) '[2 2]))
-      (assert (= @(t_size inp) '[2 2]))
+      (is (= @(t_size inp) '[2 2]))
+      (is (= @(t_size inp) '[2 2]))
       (println "[OK] t_size...")
       )
   )
