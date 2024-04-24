@@ -1,6 +1,6 @@
 (ns llm.softmax_crossentropy
   (:require [clojure.math :as math])
-  (:require [llm.utils :refer [t_idx t_size t_zeros_like t_allclose]])
+  (:require [llm.utils :refer [t_idx t_size t_zeros_like t_allclose t_item]])
 )
 
 (defn softmax_forward [probs logits]
@@ -31,10 +31,9 @@
     (dotimes [b B]
       (dotimes [t T]
         (let [probs_bt (t_idx probs b t) ;; last dimension of probs
-              idx (t_idx targets b t)]  ;; index of current target.
-          (swap! losses update-in [b t] (fn [_] (mapv #(- (math.log @(t_idx probs_bt idx)))))) 
+              idx @(t_idx targets b t)]  ;; index of current target.
+          (swap! losses update-in [b t] (fn [_] (- (math/log (t_item (t_idx probs_bt idx)))))))
           )))
-  )
 )
 
 (defn crossentropy_softmax_backward [dlogits dlosses probs targets]

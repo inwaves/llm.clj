@@ -52,6 +52,11 @@
     (atom flattened))
 )
 
+(defn t_item [tensor]
+  (let [flat_tensor (t_flatten tensor)]
+    (assert (= 1 (count @flat_tensor)))
+  (first @flat_tensor)))
+
 (defn t_allclose 
   ([input other rtol atol]
   "|input - other | <= atol + rtol * |other|"
