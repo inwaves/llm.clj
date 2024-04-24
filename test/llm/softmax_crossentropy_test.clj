@@ -1,5 +1,5 @@
-(ns llm.softmax_test
-  (:require [llm.softmax :refer [softmax_forward]])
+(ns llm.softmax_crossentropy_test
+  (:require [llm.softmax_crossentropy :refer :all])
   (:require [llm.utils :refer [t_zeros_like t_allclose]])
   (:require [clojure.test :refer [deftest testing is]]))
 
@@ -13,4 +13,10 @@
         (println "[OK] softmax_forward_test...")
       )
     )
+)
+
+(deftest crossentropy_forward_test
+  (testing "Normal usage..."
+
+  )  
 )
