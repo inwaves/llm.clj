@@ -1,16 +1,18 @@
 # llm.clj
+
 A port of llm.c to Clojure.
 
 TODO:
+
 - [x] check code I write against reference implementation
   - [x] print properly and check outputs
-- [x] helpers 
+- [x] helpers
   - [x] torch-style functions that operate on tensors
   - [x] tests (partial)
 - [ ] layers' forwards and backwards passes
   - [x] `GELU`
-  - [ ] `softmax`
-  - [ ] `crossentropy`
+  - [x] `softmax`
+  - [x] `crossentropy`
   - [ ] `encoder`
   - [ ] `layernorm`
   - [ ] `matmul` (linear/fully-connected/dense)

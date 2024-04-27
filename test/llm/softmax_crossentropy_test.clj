@@ -29,9 +29,28 @@
       (println "[OK] crossentropy_forward..."))))
 
 (deftest crossentropy_softmax_backward_test
+  "FIXME: this test doesn't work right now,
+  find a ground truth to check against."
   (testing "Normal usage..."
-    (let [dlogits ""
-          dlosses ""
-          probs ""
-          targets ""])
-    (println "[OK] crossentropy_softmax_backward...")))
+    (let [logits (atom [[[0.1 0.2 0.3 0.4]
+                         [0.5 0.6 0.7 0.8]
+                         [0.9 1.0 1.1 1.2]]
+                        [[1.3 1.4 1.5 1.6]
+                         [1.7 1.8 1.9 2.0]
+                         [2.1 2.2 2.3 2.4]]])
+          probs (t_zeros_like logits)
+          targets (atom [[2 1 3] [0 0 3]])
+          dlosses (atom [[0.1 0.2 0.3] [0.4 0.5 0.6]])
+          dlogits (t_zeros_like logits)
+          expected (atom [[[0.02497919 0.02663422 -0.07838659 0.02677318]
+                           [0.05323514 -0.14647294 0.04647489 0.04676291]
+                           [0.07175925 0.07383042 0.07589582 -0.22148549]]
+                          [[0.35004634 -0.14142654 -0.11676554 -0.09185426]
+                           [0.43755726 -0.17678290 -0.14595641 -0.11481795]
+                           [0.07512523 0.07663095 0.07814872 -0.23990489]]])]
+      (softmax_forward probs logits)
+      (println probs)
+      (println targets)
+      (crossentropy_softmax_backward dlogits dlosses probs targets)
+      (is (t_allclose dlogits expected))
+      (println "[OK] crossentropy_softmax_backward..."))))
