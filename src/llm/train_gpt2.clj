@@ -1,4 +1,3 @@
 ;; Import all the building blocks...
-(ns llm.train
+(ns llm.train_gpt2
   (:require [llm.gelu :refer [gelu_forward gelu_backward]]))
-
