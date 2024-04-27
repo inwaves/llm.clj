@@ -30,3 +30,20 @@ input: bias (C,)
                        (+ bias_c (* weight_c (* rstd_bt (- inp_btc mean_inp_bt)))))))
             (swap! mean update-in [b t] mean_inp_bt)
             (swap! rstd update-in [b t] rstd_bt)))))))
+
+(defn layernorm_backward
+  "Backpropagating through the layer normalisation operation."
+  [dinp dweight dbias dout inp weight mean rstd]
+  (let [[B T C] (t_size dout)]
+    (dotimes [b B]
+      (dotimes [t T]
+        (let [dout_bt (t_idx dout b t)
+              inp_bt (t_idx inp b t)
+              dinp_bt (t_idx dinp b t)
+              mean_bt (t_idx mean b t)
+              rstd_bt (t_idx rstd b t)
+              dnorm_mean (reduce + (map * dout_bt weight))]
+          ;; (* (- inp_btc mean_btc) rstd_btc)
+          ;; (* (t_item (t_idx weight c)) dout_btc)
+          ;; TODO: can you collapse these two loops into one?
+          (dotimes [c C]))))))
