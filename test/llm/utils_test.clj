@@ -1,7 +1,7 @@
+#_{:clj-kondo/ignore [:underscore-in-namespace]}
 (ns llm.utils_test
-  (:require [clojure.test :refer :all]
-            [llm.clj :refer :all]
-            [llm.utils :refer :all]))
+  (:require [clojure.test :refer [deftest testing is]]
+            [llm.utils :refer [t_allclose t_idx t_size t_fill t_mean t_var]]))
 
 ;; All these tests can be improved, leaving for later.
 
@@ -33,3 +33,13 @@
     (is (thrown? IllegalArgumentException (t_fill 0 '(0))))
     (is (= @(t_fill 0 '(1)) [0])))
   (println "[OK] t_fill..."))
+
+(deftest t_mean_test
+  (testing "Normal usage..."
+    (is (= 2 (t_mean (atom [1 2 3]))))
+    (println "[OK] t_mean...")))
+
+(deftest t_var_test
+  (testing "Normal usage..."
+    (is (= 2/3 (t_var (atom [1 2 3]))))
+    (println "[OK] t_var...")))

@@ -8,12 +8,20 @@ TODO:
   - [x] print properly and check outputs
 - [x] helpers
   - [x] torch-style functions that operate on tensors
-  - [x] tests (partial)
+- [ ] tests
+  - [x] `GELU`
+  - [x] `softmax`
+  - [x] `crossentropy` (ish – check the backprop test)
+  - [ ] `encoder`
+  - [ ] `layernorm`
+  - [ ] `matmul`
+  - [ ] `attention`
+  - [ ] `residual`
 - [ ] layers' forwards and backwards passes
   - [x] `GELU`
   - [x] `softmax`
   - [x] `crossentropy`
-  - [ ] `encoder`
+  - [x] `encoder`
   - [ ] `layernorm`
   - [ ] `matmul` (linear/fully-connected/dense)
   - [ ] `attention`
