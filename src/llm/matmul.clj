@@ -9,7 +9,7 @@
     out will be (B,T,OC)"
   [outp inp weight bias]
   (let [[B T _] @(t_size inp)
-        OC (t_item (t_size bias))]
+        OC (last @(t_size weight))] ;; don't get the size from bias – it can be nil.
     (dotimes [b B]
       (dotimes [t T]
         (let [inp_bt (t_idx inp b t)]
@@ -22,4 +22,24 @@
   "most of the running time is spent here and in matmul_forward
     this backward could be done in a single 'round' of loops
     but that doesn't afford an efficient parallelization strategy"
-  [dinp dweight dbias dout inp weight])
+  [dinp dweight dbias dout inp weight]
+  (let [[B T C] @(t_size dinp)
+        OC (last @(t_size dweight))]
+
+  ;; grad wrt/ inputs
+    (dotimes [b B]
+      (dotimes [t T]
+        (dotimes [o OC]
+          (let [wrow (t_idx weight o)
+                d (t_item (t_idx dout b t o))]
+            (dotimes [c C]
+              (swap! dinp update-in [b t c] (fn [dinp_btc] (+ dinp_btc (* (t_item (t_idx wrow c)) d)))))))))
+
+    ;; wrt/ weight and bias matrices
+    (dotimes [o OC]
+      (dotimes [b B]
+        (dotimes [t T]
+          (let [dout_bto (t_item (t_idx dout b t o))]
+            (if (not (nil? dbias)) (swap! dbias [o] (fn [dbias_o] (+ dbias_o dout_bto))) nil)
+            (dotimes [c C]
+              (swap! dweight [o c] (fn [dweight_oc] (+ dweight_oc (* (t_item (t_idx inp b t c)) dout_bto)))))))))))
