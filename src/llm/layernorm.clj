@@ -13,7 +13,7 @@ input: weight (C,)
 input: bias (C,)
 "
   [out mean rstd inp weight bias]
-  (let [[B T C] (t_size out)
+  (let [[B T C] @(t_size out)
         eps 1e-5]
     (dotimes [b B]
       (dotimes [t T]
@@ -34,7 +34,7 @@ input: bias (C,)
 (defn layernorm_backward
   "Backpropagating through the layer normalisation operation."
   [dinp dweight dbias dout inp weight mean rstd]
-  (let [[B T C] (t_size dout)]
+  (let [[B T C] @(t_size dout)]
     (dotimes [b B]
       (dotimes [t T]
         (let [dout_bt (t_idx dout b t)

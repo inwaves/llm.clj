@@ -8,15 +8,15 @@
     inp is (B,T,C), weight is (OC, C), bias is (OC)
     out will be (B,T,OC)"
   [outp inp weight bias]
-  (let [[B T _] (t_size inp)
-        OC (first @(t_size bias))]
+  (let [[B T _] @(t_size inp)
+        OC (t_item (t_size bias))]
     (dotimes [b B]
       (dotimes [t T]
         (let [inp_bt (t_idx inp b t)]
           (dotimes [o OC]
             (let [val (if (nil? bias) 0.0 (t_item (t_idx bias o)))
                   wrow (t_idx weight o)]
-              (swap! outp update-in [o] (fn [_] (+ val (reduce + (map * inp_bt wrow))))))))))))
+              (swap! outp update-in [b t o] (fn [_] (+ val (reduce + (map * @inp_bt @wrow))))))))))))
 
 (defn matmul_backward
   "most of the running time is spent here and in matmul_forward

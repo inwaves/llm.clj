@@ -9,7 +9,7 @@
   inp is (B,T) of integers, holding the token ids at each (b,t) position
   wte is (V,C) of token embeddings, short for 'weight token embeddings'
   wpe is (maxT,C) of position embeddings, short for 'weight positional embedding'"
-  (let [[B T C] (t_size out)]
+  (let [[B T C] @(t_size out)]
     (dotimes [b B]
       (dotimes [t T]
         (let [idx (t_idx inp b t)
@@ -19,7 +19,7 @@
 
 (defn encoder_backward
   [dwte dwpe dout inp]
-  (let [[B T C] (t_size dout)]
+  (let [[B T C] @(t_size dout)]
     (dotimes [b B]
       (dotimes [t T]
         (let [dout_bt (t_idx dout b t)

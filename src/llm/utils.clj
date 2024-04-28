@@ -3,9 +3,8 @@
 (defn atom? [x] (= (type x) clojure.lang.Atom))
 (defn in? [xs el] (some #(= % el) xs))
 
-(defn assert_all [_fn & test_cases]
-  ;; TODO:
-  )
+(defn t_eq [tensor t_other]
+  (= @tensor @t_other))
 
 (defn flatten_tensor [tensor]
   (if (vector? tensor)
@@ -31,14 +30,14 @@
                 [coll])))]
     (atom (resolve-index @tensor indices))))
 
-(defn t_size [tensor]
+(defn t_size
   "Get the size of a given tensor, return it as a tensor."
+  [tensor]
   (let [dims (atom [(count @tensor)])]
     (loop [t_copy @tensor]
       (when (vector? (first t_copy))
         (swap! dims conj (count (first t_copy)))
         (recur (first t_copy))))
-
     dims))
 
 (defn t_flatten [tensor]
