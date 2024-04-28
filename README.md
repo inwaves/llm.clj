@@ -14,18 +14,18 @@ TODO:
   - [x] `crossentropy` (ish – check the backprop test)
   - [ ] `encoder`
   - [ ] `layernorm`
-  - [ ] `matmul`
+  - [~] `matmul`
   - [ ] `attention`
-  - [ ] `residual`
+  - [x] `residual`
 - [ ] layers' forwards and backwards passes
   - [x] `GELU`
   - [x] `softmax`
   - [x] `crossentropy`
   - [x] `encoder`
   - [x] `layernorm`
-  - [ ] `matmul` (linear/fully-connected/dense)
+  - [x] `matmul` (linear/fully-connected/dense)
   - [ ] `attention`
-  - [ ] `residual`
+  - [x] `residual`
 - [ ] model building blocks
   - [ ] `ParameterTensors`
   - [ ] `ActivationTensors`
@@ -40,3 +40,4 @@ TODO:
   - [ ] tokenizer
   - [ ] training loop
 - [ ] think about parallelisation solutions, e.g. `matmul` in the original imp uses `#pragma omp parallel for collapse(2)`
+- [ ] more idiomatic solutions for the building blocks that still works on tensors in-place?
