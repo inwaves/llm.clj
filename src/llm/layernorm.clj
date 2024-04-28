@@ -39,11 +39,19 @@ input: bias (C,)
       (dotimes [t T]
         (let [dout_bt (t_idx dout b t)
               inp_bt (t_idx inp b t)
-              dinp_bt (t_idx dinp b t)
-              mean_bt (t_idx mean b t)
-              rstd_bt (t_idx rstd b t)
-              dnorm_mean (reduce + (map * dout_bt weight))]
-          ;; (* (- inp_btc mean_btc) rstd_btc)
-          ;; (* (t_item (t_idx weight c)) dout_btc)
-          ;; TODO: can you collapse these two loops into one?
-          (dotimes [c C]))))))
+              mean_bt (t_item (t_idx mean b t))
+              rstd_bt (t_item (t_idx rstd b t))
+
+              ;; If something is wrong with this function, it's likely to be here.
+              dnorm_mean (/ (reduce + (map * dout_bt weight)) C)
+              dnorm_norm_mean (/ (reduce + (map *
+                                                (map * dout_bt weight) ;; dnorm_i
+                                                (map (fn [inp_bt_i] (* rstd_bt (- inp_bt_i mean_bt))) inp_bt))) C)]
+          (dotimes [c C]
+            (let [norm_btc (* (- (t_item (t_idx inp_bt c)) mean_bt) rstd_bt)
+                  dout_btc (t_item (t_idx dout_bt c))
+                  dnorm_c (* (t_item (t_idx weight c)) dout_btc)
+                  dval (* (- (- dnorm_c dnorm_mean) (* norm_btc dnorm_norm_mean)) rstd_bt)]
+              (swap! dbias update-in [c] (fn [dbias_c] (+ dbias_c dout_btc)))
+              (swap! dweight update-in [c] (fn [dweight_c] (+ dweight_c (* norm_btc dout_btc))))
+              (swap! dinp update-in [b t c] (fn [dinp_btc] (+ dinp_btc dval))))))))))

@@ -22,7 +22,7 @@ TODO:
   - [x] `softmax`
   - [x] `crossentropy`
   - [x] `encoder`
-  - [ ] `layernorm`
+  - [x] `layernorm`
   - [ ] `matmul` (linear/fully-connected/dense)
   - [ ] `attention`
   - [ ] `residual`
@@ -39,3 +39,4 @@ TODO:
   - [ ] sampler
   - [ ] tokenizer
   - [ ] training loop
+- [ ] think about parallelisation solutions, e.g. `matmul` in the original imp uses `#pragma omp parallel for collapse(2)`
