@@ -16,6 +16,7 @@
           (dotimes [o OC]
             (let [val (if (nil? bias) 0.0 (t_item (t_idx bias o)))
                   wrow (t_idx weight o)]
+            ;; FIXME: This is broken, the last item doesn't get updated at all.
               (swap! outp update-in [b t o] (fn [_] (+ val (reduce + (map * @inp_bt @wrow))))))))))))
 
 (defn matmul_backward
