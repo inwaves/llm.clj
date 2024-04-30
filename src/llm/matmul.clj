@@ -9,14 +9,13 @@
     out will be (B,T,OC)"
   [outp inp weight bias]
   (let [[B T _] @(t_size inp)
-        OC (last @(t_size weight))] ;; don't get the size from bias – it can be nil.
+        OC (first @(t_size weight))] ;; don't get the size from bias – it can be nil.
     (dotimes [b B]
       (dotimes [t T]
         (let [inp_bt (t_idx inp b t)]
           (dotimes [o OC]
             (let [val (if (nil? bias) 0.0 (t_item (t_idx bias o)))
                   wrow (t_idx weight o)]
-            ;; FIXME: This is broken, the last item doesn't get updated at all.
               (swap! outp update-in [b t o] (fn [_] (+ val (reduce + (map * @inp_bt @wrow))))))))))))
 
 (defn matmul_backward
