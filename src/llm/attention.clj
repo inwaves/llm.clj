@@ -41,6 +41,8 @@
               (dotimes [i hs]
                 (swap! outp update-in [b t h i] (fn [outp_bthi] (+ outp_bthi (* (t_idx att b t h t2) (t_idx inp b t2 (+ (* 2 C) h) i)))))))))))))
 
+;; Used Claude for this, prompted with my port above
+;; and the two originals in C by karpathy.
 (defn attention_backward
   "inp/dinp are (B, T, 3C) Q,K,V
    att/datt/dpreatt are (B, NH, T, T)
