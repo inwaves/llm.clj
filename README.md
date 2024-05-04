@@ -24,7 +24,7 @@ TODO:
   - [x] `encoder`
   - [x] `layernorm`
   - [x] `matmul` (linear/fully-connected/dense)
-  - [ ] `attention`
+  - [~] `attention` (forward pass done)
   - [x] `residual`
 - [ ] model building blocks
   - [ ] `ParameterTensors`
@@ -41,3 +41,4 @@ TODO:
   - [ ] training loop
 - [ ] think about parallelisation solutions, e.g. `matmul` in the original imp uses `#pragma omp parallel for collapse(2)`
 - [ ] more idiomatic solutions for the building blocks that still works on tensors in-place?
+  - specifically for attention – it looks horrible right now: loop inside loops inside loops...
