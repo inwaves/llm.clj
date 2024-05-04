@@ -11,16 +11,32 @@
     attention is the only layer that mixes information across time
     every other operation is applied at every (b,t) position independently
     (and of course, no layer mixes information across batch)"
-  [out preatt att inp]
+  [outp preatt att inp]
   (let [[B T C3] @(t_size inp)
-        [_ NH T _] @(t_size att)
-        hs (/ (/ C3 3) NH)
+        C (/ C3 3)
+        [_ NH _ _] @(t_size att)
+        hs (/ C NH)
         scale (/ 1.0 (math/sqrt hs))]
     (dotimes [b B]
       (dotimes [t T]
         (dotimes [h NH]
-          (let [query_t (t_idx query t)
-                preatt_bth (t_idx preatt b t h)
-                att_bth (t_idx att b t h)]
-                ;; TODO: Q@K.T * scale
-            ))))))
+          (dotimes [t2 t]
+            ;; exp((query_t) x (key_t2) - maxvalue)
+            ;; TODO: should initialise with really large neg values to track maxval?
+            ;; TODO: indexing correct?
+            (swap! preatt update-in [b t h t2] (fn [_] (* scale (reduce + (map * (t_idx inp b t h) (t_idx inp b t2 (+ C h)))))))
+            (swap! att update-in [b t h t2]
+                   (fn [_]
+                     (math/exp  (- (t_idx preatt b t h t2) (max (t_idx preatt b t h))))))
+
+                    ;; normalise by the sum to get softmax
+            (dotimes [t2 t]
+              (let [raw_expsum (reduce + (t_idx att b t h))
+                    expsum_inv (if (= raw_expsum 0) 0.0 (/ 1 raw_expsum))] ;; avoid division by 0
+                (swap! att update-in [b t h t2]
+                       (fn [att_btht2] (* att_btht2 expsum_inv)))))
+
+            ;; accumulate weighted values into output of attention
+            (dotimes [t2 t]
+              (dotimes [i hs]
+                (swap! outp update-in [b t h i] (fn [outp_bthi] (+ outp_bthi (* (t_idx att b t h t2) (t_idx inp b t2 (+ (* 2 C) h) i)))))))))))))
