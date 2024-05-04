@@ -1,3 +1,3 @@
 ;; Import all the building blocks...
-(ns llm.train_gpt2
-  (:require [llm.gelu :refer [gelu_forward gelu_backward]]))
+#_{:clj-kondo/ignore [:underscore-in-namespace]}
+(ns llm.train_gpt2)

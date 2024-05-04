@@ -5,13 +5,13 @@
 
 (defn layernorm_forward
   "reference: https://pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html
-both inp and out are (B,T,C) of the activations
-mean and rstd are (B,T) buffers, to be used later in backward pass
-at each position (b,t) of the input, the C-dimensional vector
-of activations gets normalized, then scaled and shifted
-input: weight (C,)
-input: bias (C,)
-"
+    both inp and out are (B,T,C) of the activations
+    mean and rstd are (B,T) buffers, to be used later in backward pass
+    at each position (b,t) of the input, the C-dimensional vector
+    of activations gets normalized, then scaled and shifted
+    input: weight (C,)
+    input: bias (C,)
+    "
   [out mean rstd inp weight bias]
   (let [[B T C] @(t_size out)
         eps 1e-5]

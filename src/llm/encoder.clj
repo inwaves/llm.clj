@@ -1,15 +1,14 @@
-#_{:clj-kondo/ignore [:misplaced-docstring]}
 (ns llm.encoder
   (:require
    [llm.utils :refer [t_idx t_item t_size]]))
 
 (defn encoder_forward
-  [out inp wte wpe]
   "out is (B,T,C). At each position (b,t), a C-dimensional vector summarizing token & position
   inp is (B,T) of integers, holding the token ids at each (b,t) position
   wte is (V,C) of token embeddings, short for 'weight token embeddings'
   wpe is (maxT,C) of position embeddings, short for 'weight positional embedding'"
-  (let [[B T C] @(t_size out)]
+  [out inp wte wpe]
+  (let [[B T _] @(t_size out)]
     (dotimes [b B]
       (dotimes [t T]
         (let [idx (t_idx inp b t)

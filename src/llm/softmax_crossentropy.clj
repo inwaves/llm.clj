@@ -1,14 +1,14 @@
 #_{:clj-kondo/ignore [:underscore-in-namespace]}
 (ns llm.softmax_crossentropy
   (:require [clojure.math :as math])
-  (:require [llm.utils :refer [t_idx t_size t_zeros_like t_allclose t_item]]))
+  (:require [llm.utils :refer [t_idx t_size t_item]]))
 
 (defn softmax_forward
   "input: logits are (B, T, V) of the unnormalised log probabilities
    output: probs are (B, T, V) of the probabilities (sums to 1.0 in
    each b, t position)"
   [probs logits]
-  (let [[B T V] @(t_size probs)]
+  (let [[B T _] @(t_size probs)]
     (dotimes [b B]
       (dotimes [t T]
         (let [logits_bt (t_idx logits b t)
@@ -24,7 +24,7 @@
    input: targets is (B T) of integers giving the correct index in logits
   "
   [losses probs targets]
-  (let [[B T V] @(t_size probs)]
+  (let [[B T _] @(t_size probs)]
     (dotimes [b B]
       (dotimes [t T]
         (let [probs_bt (t_idx probs b t) ;; last dimension of probs

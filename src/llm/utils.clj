@@ -11,14 +11,14 @@
     (vec (mapcat flatten_tensor tensor))
     [tensor]))
 
-(defn t_idx [tensor & indices]
+(defn t_idx
   "Python-style slicing.
    Params:
     tensor (Atom) - the tensor to slice into;
     indices (vector) - indices to select;
    Returns:
     sliced_tensor (Atom) - requested values from the original tensor."
-
+  [tensor & indices]
   (letfn [(resolve-index [coll indices]
             (if (seq indices)
               (let [[index & rest-indices] indices]
@@ -53,21 +53,22 @@
     (first @flat_tensor)))
 
 (defn t_allclose
+  "|input - other | <= atol + rtol * |other|"
   ([input other rtol atol]
-   "|input - other | <= atol + rtol * |other|"
    (let [atol (double atol)
          rtol (double rtol)
          flat_input (t_flatten input)
          flat_other (t_flatten other)]
-     (defn single_allclose [single_inp single_other]
-       (<= (abs (- single_inp single_other)) (+ atol (* rtol (abs single_other)))))
-     (every? true? (map single_allclose @flat_input @flat_other))))
+     (letfn [(single_allclose [single_inp single_other]
+               (<= (abs (- single_inp single_other)) (+ atol (* rtol (abs single_other)))))]
+       (every? true? (map single_allclose @flat_input @flat_other)))))
   ([input other] (t_allclose input other 0.1 0)))
 
-(defn t_fill [fill_value sizes]
+(defn t_fill
   "Fill a tensor of a given shape with fill_value."
+  [fill_value sizes]
   (if (in? sizes 0)
-    (throw (IllegalArgumentException. "Cannot have size 0.")))
+    (throw (IllegalArgumentException. "Cannot have size 0.")) nil)
   (atom
    (if (= (count sizes) 1)
      (vec (repeat (first sizes) fill_value)) ;; Base case: repeat value.
