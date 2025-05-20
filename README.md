@@ -12,7 +12,7 @@ TODO:
   - [x] `GELU`
   - [x] `softmax`
   - [x] `crossentropy` (ish – check the backprop test)
-  - [ ] `encoder`
+  - [x] `encoder`
   - [ ] `layernorm`
   - [~] `matmul`
   - [ ] `attention`
