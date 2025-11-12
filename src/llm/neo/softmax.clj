@@ -3,10 +3,7 @@
   
   Softmax converts logits to probabilities by exponentiating and normalizing.
   Uses the numerical stability trick: softmax(x) = softmax(x - max(x))"
-  (:require [uncomplicate.neanderthal
-             [core :refer [ncols mrows entry! entry]]
-             [native :refer [dge]]
-             [math :refer [exp]]]))
+  (:use [uncomplicate.neanderthal core native math]))
 
 (defn max-along-cols
   "Find maximum value in each row (across columns).
