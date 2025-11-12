@@ -1,12 +1,6 @@
 (ns llm.neo.layernorm
-  "Layer Normalization using Neanderthal.
-  
-  LayerNorm normalizes activations across the last dimension (features),
-  computing mean and variance for each row independently."
-  (:require [uncomplicate.neanderthal
-             [core :refer [ncols mrows entry! entry copy!]]
-             [native :refer [dge dv]]
-             [math :refer [sqrt]]]))
+  "Layer Normalization using Neanderthal."
+  (:use [uncomplicate.neanderthal core native math]))
 
 (defn mean-along-cols
   "Compute mean of each row (across columns).

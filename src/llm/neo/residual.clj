@@ -2,9 +2,7 @@
   "Residual connections using Neanderthal.
   
   Residual connections add the input to the output: y = x + f(x)"
-  (:require [uncomplicate.neanderthal
-             [core :refer [axpy! copy! mrows ncols]]
-             [native :refer [dge]]]))
+  (:use [uncomplicate.neanderthal core native]))
 
 (defn residual-forward
   "Add two matrices element-wise (residual connection).

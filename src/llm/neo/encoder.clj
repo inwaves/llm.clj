@@ -1,14 +1,7 @@
 (ns llm.neo.encoder
-  "Token and position embedding encoder using Neanderthal.
-  
-  The encoder:
-  1. Looks up token embeddings from wte based on input indices
-  2. Looks up position embeddings from wpe based on positions  
-  3. Adds them element-wise to produce encoded representations"
-  (:require [uncomplicate.neanderthal
-             [core :refer [mrows ncols entry entry!]]
-             [native :refer [dge]]]
-            [llm.neo.core :as neo]))
+  "Token and position embedding encoder using Neanderthal."
+  (:use [uncomplicate.neanderthal core native])
+  (:require [llm.neo.core :as neo]))
 
 (defn encoder-forward
   "Forward pass for token + position embedding.
