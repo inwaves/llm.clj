@@ -6,9 +6,10 @@
 
 (defn create-gpt2-config
   "Create a GPT-2 configuration for a specific model size.
-  Sizes: :tiny (30M), :small (124M), :medium (350M)"
+  Sizes: :micro (test), :tiny (30M), :small (124M), :medium (350M)"
   [size]
   (case size
+    :micro  (->GPT2Config 16 100 1 2 32)      ; Minimal for testing
     :tiny   (->GPT2Config 1024 50257 6  6  384)
     :small  (->GPT2Config 1024 50257 12 12 768)
     :medium (->GPT2Config 1024 50257 24 16 1024)
