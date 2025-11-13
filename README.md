@@ -108,11 +108,44 @@ The foundation is now in place:
 - ✅ Performance benchmarking (10-50x speedup)
 - ✅ Clean pattern for future operations
 
-### Key Files
+## Phase 1: Core Operations (COMPLETED ✅)
 
-- `src/llm/neo/core.clj` - Core utilities for all neo implementations
-- `src/llm/neo/matmul.clj` - Neanderthal-based matrix multiplication
-- `test/llm/neo/matmul_simple_test.clj` - Validation and benchmarks
+All core operations have been implemented with Neanderthal:
+
+### Implemented Operations
+
+- ✅ **Matmul** - Matrix multiplication (forward + backward)
+- ✅ **Encoder** - Token and position embeddings (forward + backward)
+- ✅ **LayerNorm** - Layer normalization (forward + backward)
+- ✅ **GELU** - Activation function (forward + backward)
+- ✅ **Residual** - Residual connections (forward + backward)
+- ✅ **Softmax** - Softmax with autoregressive masking (forward + backward)
+- ✅ **Attention** - Multi-head self-attention (forward + backward)
+
+All operations achieve 10-50x speedup over pure Clojure implementations.
+
+## Phase 2: Training Infrastructure (85% COMPLETE ⚠️)
+
+Most training infrastructure is in place:
+
+### Completed Components ✅
+
+- ✅ **Model State Management** - GPT2Config, ParameterTensors, ModelState
+- ✅ **Forward Pass** - Complete end-to-end GPT-2 forward pass
+- ✅ **Loss Computation** - Cross-entropy loss
+- ✅ **AdamW Optimizer** - Full implementation with bias correction
+- ✅ **Training Loop** - Epoch iteration and step tracking
+- ✅ **Data Pipeline** - Token loading and batch creation
+- ✅ **Checkpointing** - Save/load model state
+
+### Missing Component ❌
+
+- ❌ **Composed Backward Pass** - While individual operations have backward methods, there's no `gpt2-backward` function that chains them together to compute gradients through the full model. This is the critical missing piece preventing actual end-to-end training.
+
+**What this means:**
+- ✅ You can run forward passes and compute loss
+- ❌ You cannot compute gradients or train the model end-to-end
+- ❌ The optimizer exists but has no gradients to apply
 
 ### Performance Results
 
@@ -121,59 +154,43 @@ On typical hardware (modern CPU, no GPU yet):
 - **Neanderthal**: ~5ms for same operation
 - **Speedup**: ~30x
 
-## Next Steps: Phase 1 - Core Operations
 
-Convert remaining operations to Neanderthal:
-
-### Priority Order
-
-1. ✅ **Matmul** - DONE (biggest performance impact)
-2. **Encoder** - Embedding lookup (easy, use Neanderthal indexing)
-3. **LayerNorm** - Row-wise operations
-4. **GELU** - Element-wise operations with Neanderthal vect-math
-5. **Residual** - Element-wise addition
-6. **Softmax** - Row-wise operations with stability
-7. **Attention** - Composition of above operations
-
-Each operation will follow the pattern:
-- Implement in `llm.neo.*` namespace
-- Test against pure version
-- Benchmark performance
-- Document learnings
 
 ## TODO
 
-### Completed
+### Completed ✅
 - [x] Infrastructure setup (Phase 0A)
 - [x] Neanderthal integration
 - [x] Matrix multiplication (forward + backward)
 - [x] Validation framework
 - [x] Performance benchmarking
+- [x] Complete core operations with Neanderthal (Phase 1)
+  - [x] `matmul`
+  - [x] `encoder`
+  - [x] `layernorm`
+  - [x] `gelu`
+  - [x] `residual`
+  - [x] `softmax`
+  - [x] `attention`
+- [x] Model building blocks (Phase 2 - partial)
+  - [x] `ParameterTensors`
+  - [x] `ActivationTensors`
+  - [x] `GPT2Config`
+  - [x] `GPT2`
+- [x] Forward function (`gpt2_forward`)
+- [x] Optimizer (AdamW)
+- [x] Training infrastructure (partial)
+  - [x] `DataLoader`
+  - [x] Training loop structure
+  - [x] Checkpointing
 
-### In Progress
-- [ ] Complete core operations with Neanderthal
-  - [x] `matmul` - DONE
-  - [ ] `encoder`
-  - [ ] `layernorm`
-  - [ ] `gelu`
-  - [ ] `residual`
-  - [ ] `softmax`
-  - [ ] `attention`
+### Critical Missing Piece ⚠️
+- [ ] **Composed Backward Pass** - `gpt2_backward` function to chain individual operation gradients through the full network
 
-### Upcoming
-- [ ] Model building blocks
-  - [ ] `ParameterTensors`
-  - [ ] `ActivationTensors`
-  - [ ] `GPT2Config`
-  - [ ] `GPT2`
-- [ ] Forward function (`gpt2_forward`)
-- [ ] Backward function (`gpt2_backward`)
-- [ ] Optimizer (AdamW)
-- [ ] Training infrastructure
-  - [ ] `DataLoader`
-  - [ ] Tokenizer
-  - [ ] Training loop
+### Upcoming (Phase 3+)
 - [ ] GPU acceleration (ClojureCUDA)
+- [ ] Multi-GPU support
+- [ ] Further optimizations
 
 ## Learning Resources
 
@@ -225,11 +242,31 @@ The project is configured for REPL-driven development:
 (neo/benchmark #(m/matmul-forward ...) 100)
 ```
 
+## Next Steps: Complete Phase 2
+
+To make the model fully trainable, implement the composed backward pass:
+
+**Required Implementation:**
+A `gpt2-backward` function (likely in `src/llm/neo/forward.clj` or new `src/llm/neo/backward.clj`) that:
+1. Takes the loss gradient
+2. Backpropagates through final layer norm
+3. Backpropagates through each transformer block in reverse order
+4. Accumulates gradients for all parameters
+5. Returns gradient structure matching ParameterTensors
+
+**Technical Approach:**
+- Chain existing backward methods: `attention-backward`, `layernorm-backward`, `matmul-backward`, etc.
+- Maintain activation caches from forward pass
+- Accumulate gradients properly through residual connections
+- Handle gradient flow through layer norm rescaling
+
+Once this ~15% of Phase 2 is complete, the model will be fully trainable on CPU, ready for Phase 3 (GPU acceleration).
+
 ## Contributing
 
 Contributions welcome! Focus areas:
 
-1. Complete Phase 1 operations (encoder, layernorm, etc.)
+1. Complete Phase 2 backward pass composition
 2. Add more test cases
 3. Improve documentation
 4. Performance profiling and optimization

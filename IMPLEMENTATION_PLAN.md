@@ -124,9 +124,11 @@ This approach:
    - Normalization and affine transform
 4. **GELU** (Session 4)
    - Element-wise activation
-5. **Softmax** (Session 5)
+5. **Residual** (Session 5)
+   - Element-wise addition for skip connections
+6. **Softmax** (Session 5)
    - Row-wise softmax with numerical stability
-6. **Attention** (Sessions 6-7)
+7. **Attention** (Sessions 6-7)
    - Q, K, V projections
    - Attention scores and masking
    - Weighted value aggregation
@@ -381,7 +383,7 @@ This approach:
 
 | Implementation | Relative Speed | Notes |
 |----------------|----------------|-------|
-| Pure Clojure (current) | 0.5% | Educational baseline |
+| Pure Clojure (baseline) | 0.5% | Educational baseline |
 | Neanderthal CPU | 5-10% | Phase 1 completion |
 | Neanderthal CUDA | 40-60% | Phase 3 completion |
 | Optimized CUDA | 50-80% | Phase 4 completion |
