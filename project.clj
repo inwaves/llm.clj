@@ -8,6 +8,8 @@
                  ;; High-performance linear algebra with OpenBLAS backend
                  [org.uncomplicate/neanderthal-base "0.57.0"]
                  [org.uncomplicate/neanderthal-openblas "0.57.0"]
+                 ;; CUDA backend for GPU acceleration
+                 [org.uncomplicate/neanderthal-cuda "0.57.0"]
                  ;; CUDA support for GPU acceleration
                  [uncomplicate/clojurecuda "0.16.0"]
                  ;; Performance benchmarking
