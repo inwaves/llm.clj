@@ -55,40 +55,53 @@
              batch-out)))))
 
 (defn encoder-backward
-  "Backward pass for encoder.
+  "Backward pass for encoder (token + position embeddings).
+  
+  Scatters gradients from dx to:
+  - wte: based on token indices (scatter-add)
+  - wpe: based on positions (accumulate)
   
   Args:
-    dx-encoded - Gradient [B, T, C] as nested vector
-    inputs - [B, T] token indices  
-    vocab-size - V
-    max-seq-len - maxT
-    channels - C
+    dx: [B, T, C] gradient w.r.t. encoder output (nested vectors)
+    tokens: [B, T] token indices (nested vectors)
+    vocab-size: V
+    max-seq-len: maximum sequence length
+    channels: C
     
   Returns:
-    {:dwte [V, C] :dwpe [maxT, C]} as nested vectors"
-  [dx-encoded inputs vocab-size max-seq-len channels]
-  (let [B (count inputs)
-        T (count (first inputs))
+    {:dwte [V, C] nested vector of gradients for token embeddings
+     :dwpe [maxT, C] nested vector of gradients for position embeddings}"
+  [dx tokens vocab-size max-seq-len channels]
+  (let [B (count dx)
+        ;; Initialize zero gradients as nested vectors
         dwte (vec (repeat vocab-size (vec (repeat channels 0.0))))
         dwpe (vec (repeat max-seq-len (vec (repeat channels 0.0))))]
     
-    (loop [b 0 dwte-acc dwte dwpe-acc dwpe]
+    ;; Accumulate gradients for each batch
+    (loop [b 0
+           wte-grad dwte
+           wpe-grad dwpe]
       (if (< b B)
-        (let [tokens (nth inputs b)
-              dx-batch (nth dx-encoded b)]
-          (recur (inc b)
-                 (loop [t 0 dwte2 dwte-acc]
-                   (if (< t T)
-                     (let [token-id (nth tokens t)
-                           grad-vec (nth dx-batch t)]
-                       (recur (inc t)
-                              (update dwte2 token-id (fn [old] (mapv + old grad-vec)))))
-                     dwte2))
-                 (loop [t 0 dwpe2 dwpe-acc]
-                   (if (< t T)
-                     (let [grad-vec (nth dx-batch t)]
-                       (recur (inc t)
-                              (update dwpe2 t (fn [old] (mapv + old grad-vec)))))
-                     dwpe2))))
-        {:dwte dwte-acc
-         :dwpe dwpe-acc}))))
+        (let [dx-b (nth dx b)
+              tokens-b (nth tokens b)
+              T (count tokens-b)
+              ;; Accumulate gradients for this sequence
+              [wte-g wpe-g]
+              (loop [t 0
+                     wte-g wte-grad
+                     wpe-g wpe-grad]
+                (if (< t T)
+                  (let [token (nth tokens-b t)
+                        dx-bt (nth dx-b t)
+                        ;; Scatter-add to wte[token]: wte_grad[token] += dx[b, t, :]
+                        wte-row (nth wte-g token)
+                        wte-row-new (mapv + wte-row dx-bt)
+                        wte-g-new (assoc wte-g token wte-row-new)
+                        ;; Accumulate to wpe[t]: wpe_grad[t] += dx[b, t, :]
+                        wpe-row (nth wpe-g t)
+                        wpe-row-new (mapv + wpe-row dx-bt)
+                        wpe-g-new (assoc wpe-g t wpe-row-new)]
+                    (recur (inc t) wte-g-new wpe-g-new))
+                  [wte-g wpe-g]))]
+          (recur (inc b) wte-g wpe-g))
+        {:dwte wte-grad :dwpe wpe-grad}))))
